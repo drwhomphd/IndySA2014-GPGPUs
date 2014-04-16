@@ -1,0 +1,12 @@
+PROJECT_NAME     	= libGPUGC
+OUTPUT_DIRECTORY 	= doc
+ENABLE_PREPROCESSING 	= YES
+MACRO_EXPANSION 	= YES
+SEARCH_INCLUDES 	= YES
+RECURSIVE 		= YES
+WARNINGS         	= YES
+INPUT            	= ../src 
+FILE_PATTERNS    	= *.cc *.h *.cu
+GENERATE_TAGFILE 	= doc/libGPUGC.tag
+PERL_PATH        	= /usr/bin/perl
+SEARCHENGINE     	= YES
