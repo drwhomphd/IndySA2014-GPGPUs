@@ -7,10 +7,10 @@
 
 #include <cuda.h>
 
-float *hellocuda_gpu_interface (float *, float *, int);
-float *hellocuda_cpu_interface (float *, float *, int);
-float *hellocuda_parallel_interface (float *, float *, int);
-__global__ void hellocuda_kernel(float *x, float *y, float *ans, int num_floats);
+float *hellocuda_gpu_interface (float *, float *, unsigned long long);
+float *hellocuda_cpu_interface (float *, float *, unsigned long long);
+float *hellocuda_parallel_interface (float *, float *, unsigned long long);
+__global__ void hellocuda_kernel(float *x, float *y, float *ans, unsigned long long num_floats);
 
 int main(int argc, char **argv) {
 
@@ -20,17 +20,18 @@ int main(int argc, char **argv) {
   }
 
   // We'll use the first argument of the input for the size of our floats.
-  int count = atoi(argv[1]);
+  unsigned long long count = atoll(argv[1]);
 
-  printf("Count: %d\n", count);
+  printf("Count: %llu\n", count);
 
-  float x[count];
-  float y[count];
+  float *x = (float *) malloc(count * sizeof(float));
+  float *y = (float *) malloc(count * sizeof(float));
 
   // We're going to generate count random numbers
-  FILE *rng = fopen ("/dev/urandom", "r");
-  fread(x, sizeof(float), count, rng);
-  fread(y, sizeof(float), count, rng);
+  //FILE *rng = fopen ("/dev/urandom", "r");
+
+  //fread(x, sizeof(float), count, rng);
+  //fread(y, sizeof(float), count, rng);
   
   // We use these for benchmark timing
   cudaEvent_t gpuStart, gpuStop;
@@ -44,7 +45,7 @@ int main(int argc, char **argv) {
   cudaEventSynchronize(gpuStop);
   cudaEventElapsedTime( &runtime, gpuStart, gpuStop);
 
-  printf("Regular Elapsed Time: %f\n", runtime);
+  printf("GPU Elapsed Time: %fms\n", runtime);
   free(res);
   
   cudaEventRecord(gpuStart,0); // Start event recording
@@ -53,7 +54,7 @@ int main(int argc, char **argv) {
   cudaEventSynchronize(gpuStop);
   cudaEventElapsedTime( &runtime, gpuStart, gpuStop);
   
-  printf("CPU Elapsed Time: %f\n", runtime);
+  printf("CPU Elapsed Time: %fms\n", runtime);
   free(res);
   
   cudaEventRecord(gpuStart,0); // Start event recording
@@ -62,15 +63,17 @@ int main(int argc, char **argv) {
   cudaEventSynchronize(gpuStop);
   cudaEventElapsedTime( &runtime, gpuStart, gpuStop);
   
-  printf("Parallel CPU Elapsed Time: %f\n", runtime);
+  printf("Parallel CPU Elapsed Time: %fms\n", runtime);
 
+  free(x);
+  free(y);
   free(res);
 
   return 0;
   
 }
 
-float *hellocuda_cpu_interface (float *x, float *y, int num_floats) {
+float *hellocuda_cpu_interface (float *x, float *y, unsigned long long num_floats) {
 
   float *ans_host = (float *) malloc (sizeof(float) * num_floats);
 
@@ -81,19 +84,19 @@ float *hellocuda_cpu_interface (float *x, float *y, int num_floats) {
   return ans_host;
 }
 
-float *hellocuda_parallel_interface (float *x, float *y, int num_floats) {
+float *hellocuda_parallel_interface (float *x, float *y, unsigned long long num_floats) {
   
   float *ans_host = (float *) malloc (sizeof(float) * num_floats);
 
   #pragma omp parallel for
-  for(int i = 0; i < num_floats; i++) 
+  for(unsigned long long i = 0; i < num_floats; i++) 
     ans_host[i] = x[i] * y[i];
 
   return ans_host;
 
 }
 
-float *hellocuda_gpu_interface (float *x, float *y, int num_floats) {
+float *hellocuda_gpu_interface (float *x, float *y, unsigned long long num_floats) {
 
   float *x_device;
   float *y_device;
@@ -128,7 +131,7 @@ float *hellocuda_gpu_interface (float *x, float *y, int num_floats) {
   return ans_host;
 }
 
-__global__ void hellocuda_kernel(float *x, float *y, float *ans, int num_floats) {
+__global__ void hellocuda_kernel(float *x, float *y, float *ans, unsigned long long num_floats) {
 
   register const uint32_t full_thread_id = blockIdx.x * blockDim.x + threadIdx.x;
 
