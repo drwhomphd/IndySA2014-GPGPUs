@@ -28,10 +28,10 @@ int main(int argc, char **argv) {
   float *y = (float *) malloc(count * sizeof(float));
 
   // We're going to generate count random numbers
-  //FILE *rng = fopen ("/dev/urandom", "r");
+  FILE *rng = fopen ("/dev/urandom", "r");
 
-  //fread(x, sizeof(float), count, rng);
-  //fread(y, sizeof(float), count, rng);
+  fread(x, sizeof(float), count, rng);
+  fread(y, sizeof(float), count, rng);
   
   // We use these for benchmark timing
   cudaEvent_t gpuStart, gpuStop;
