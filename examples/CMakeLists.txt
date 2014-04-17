@@ -1,1 +1,5 @@
 add_subdirectory(hellocuda)
+add_subdirectory(hellomemoryxfer)
+# add_subdirectory(hellomanaged)
+add_subdirectory(cpuvsgpu)
+add_subdirectory(optcpuvsgpu)
