@@ -8,7 +8,7 @@
 float *hellocuda_gpu_interface (float *, float *, int);
 __global__ void hellocuda_kernel(float *x, float *y, float *ans, int num_floats);
 
-int main(char **argv, int argc) {
+int main(int argc, char **argv) {
 
   float x[5] = { 1.1, 2.0, 4.2, 9.2, 4.3 };
   float y[5] = { 3.9, 9.1, 7.1, 5.5, 2.2 };
@@ -51,6 +51,10 @@ float *hellocuda_gpu_interface (float *x, float *y, int num_floats) {
 
   // Transfer our answer off the device
   cudaMemcpy(ans_host, ans_device, sizeof(float) * num_floats, cudaMemcpyDeviceToHost);
+
+  cudaFree(x_device);
+  cudaFree(y_device);
+  cudaFree(ans_device);
 
   return ans_host;
 }
