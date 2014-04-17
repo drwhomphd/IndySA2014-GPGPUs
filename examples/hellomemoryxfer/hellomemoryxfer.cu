@@ -21,9 +21,9 @@ int main(int argc, char **argv) {
   int count = atoi(argv[1]);
 
   printf("Count: %d\n", count);
-
-  float x[count];
-  float y[count];
+  
+  float *x = (float *) malloc(count * sizeof(float));
+  float *y = (float *) malloc(count * sizeof(float));
 
   // We're going to generate count random numbers
   FILE *rng = fopen ("/dev/urandom", "r");
